@@ -1,13 +1,14 @@
 """Positive and negative consumer-contract tests using synthetic artifacts."""
 
 import copy
+import json
 from pathlib import Path
 import tempfile
 import unittest
 
 from scripts.check_process import (
     ValidationError, check_repository, read_yaml, validate_issue_form,
-    validate_skill, validate_workflow,
+    validate_ruleset, validate_skill, validate_workflow,
 )
 
 
@@ -160,6 +161,59 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual(count, 1)
         self.assertEqual(len(errors), 1)
         self.assertIn("process-checks.yml", errors[0])
+
+    def test_skill_directory_without_entrypoint_is_reported(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / ".agents/skills/incomplete-skill/agents").mkdir(parents=True)
+            errors, count = check_repository(root)
+        self.assertEqual(count, 2)
+        self.assertTrue(any("incomplete-skill/SKILL.md" in error for error in errors))
+
+    def test_yaml_extension_form_is_not_silently_skipped(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            template = root / ".github/ISSUE_TEMPLATE/broken.yaml"
+            template.parent.mkdir(parents=True)
+            template.write_text("name: missing-body\ndescription: broken form\n")
+            errors, count = check_repository(root)
+        self.assertEqual(count, 2)
+        self.assertTrue(any("broken.yaml" in error for error in errors))
+
+
+class RulesetTests(unittest.TestCase):
+    def setUp(self):
+        root = Path(__file__).resolve().parents[1]
+        self.ruleset = json.loads((root / ".github/rulesets/main.json").read_text())
+        self.workflow = read_yaml((root / ".github/workflows/process-checks.yml").read_text())
+
+    def test_valid_proposal(self):
+        validate_ruleset(self.ruleset, self.workflow)
+
+    def test_accidental_activation(self):
+        self.ruleset["enforcement"] = "active"
+        with self.assertRaisesRegex(ValidationError, "disabled"):
+            validate_ruleset(self.ruleset, self.workflow)
+
+    def test_unrelated_branch(self):
+        self.ruleset["conditions"]["ref_name"]["include"] = ["~ALL"]
+        with self.assertRaisesRegex(ValidationError, "only main"):
+            validate_ruleset(self.ruleset, self.workflow)
+
+    def test_missing_required_check(self):
+        self.ruleset["rules"][3]["parameters"]["required_status_checks"][0]["context"] = "Unknown job"
+        with self.assertRaisesRegex(ValidationError, "exist in the workflow"):
+            validate_ruleset(self.ruleset, self.workflow)
+
+    def test_arbitrary_check_source(self):
+        self.ruleset["rules"][3]["parameters"]["required_status_checks"][0].pop("integration_id")
+        with self.assertRaisesRegex(ValidationError, "GitHub Actions"):
+            validate_ruleset(self.ruleset, self.workflow)
+
+    def test_bypass_grant(self):
+        self.ruleset["bypass_actors"] = [{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always"}]
+        with self.assertRaisesRegex(ValidationError, "bypass"):
+            validate_ruleset(self.ruleset, self.workflow)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 """Validate process artifacts; application behavior is outside this check's scope."""
 
 from pathlib import Path
+import json
 import re
 import sys
 
@@ -148,17 +149,55 @@ def validate_workflow(data):
                 require(nonempty(step["run"]), "run command is empty")
 
 
+def validate_ruleset(data, workflow):
+    data = mapping(data, "ruleset")
+    require(nonempty(data.get("name")), "ruleset name is required")
+    require(data.get("target") == "branch", "ruleset must target branches")
+    require(data.get("enforcement") == "disabled", "checked-in proposal must remain disabled")
+    require(data.get("bypass_actors") == [], "proposal must not grant bypass rights")
+    require(data.get("conditions") == {"ref_name": {"include": ["refs/heads/main"], "exclude": []}},
+            "proposal must target only main")
+    rules = data.get("rules")
+    require(isinstance(rules, list) and len(rules) == 4, "proposal needs four protection rules")
+    rules = {mapping(rule, "rule").get("type"): rule for rule in rules}
+    require(set(rules) == {"deletion", "non_fast_forward", "pull_request", "required_status_checks"},
+            "proposal must protect deletion, history, PRs and checks")
+    params = mapping(rules["pull_request"].get("parameters"), "PR parameters")
+    require(params == {
+        "dismiss_stale_reviews_on_push": True, "require_code_owner_review": False,
+        "require_last_push_approval": False, "required_approving_review_count": 0,
+        "required_review_thread_resolution": True,
+    }, "PR rule must preserve the single-maintainer review contract")
+    checks = mapping(rules["required_status_checks"].get("parameters"), "check parameters")
+    require(checks.get("strict_required_status_checks_policy") is True, "check evidence must include current base")
+    contexts = checks.get("required_status_checks")
+    require(isinstance(contexts, list) and len(contexts) == 1, "one required process check is expected")
+    context = mapping(contexts[0], "check context")
+    names = {job.get("name", job_id) for job_id, job in workflow["jobs"].items()}
+    require(context.get("context") in names, "required check must exist in the workflow")
+    require(context.get("integration_id") == 15368, "required check must originate from GitHub Actions")
+
+
 def check_repository(root):
     errors = []
-    checks = [(path, validate_skill) for path in sorted((root / ".agents/skills").glob("*/SKILL.md"))]
-    for path in sorted((root / ".github/ISSUE_TEMPLATE").glob("*.yml")):
+    checks = [(folder / "SKILL.md", validate_skill)
+              for folder in sorted((root / ".agents/skills").glob("*")) if folder.is_dir()]
+    templates = root / ".github/ISSUE_TEMPLATE"
+    for path in sorted([*templates.glob("*.yml"), *templates.glob("*.yaml")]):
         checks.append((path, lambda p: validate_issue_form(read_yaml(p.read_text(encoding="utf-8")))))
     checks.append((root / ".github/workflows/process-checks.yml",
                    lambda p: validate_workflow(read_yaml(p.read_text(encoding="utf-8")))))
+    ruleset = root / ".github/rulesets/main.json"
+    if ruleset.exists():
+        def check_ruleset(path):
+            workflow = read_yaml((root / ".github/workflows/process-checks.yml").read_text(encoding="utf-8"))
+            validate_workflow(workflow)
+            validate_ruleset(json.loads(path.read_text(encoding="utf-8")), workflow)
+        checks.append((ruleset, check_ruleset))
     for path, validator in checks:
         try:
             validator(path)
-        except (OSError, ValidationError) as error:
+        except (OSError, ValidationError, json.JSONDecodeError) as error:
             errors.append(f"{path.relative_to(root)}: {error}")
     return errors, len(checks)
 

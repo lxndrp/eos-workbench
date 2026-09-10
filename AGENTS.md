@@ -89,10 +89,10 @@ Einstufung; diese Tabelle legt die Prüfkonsequenzen fest.
 
 ## Lokale Methoden
 
-- `.agents/skills/eos-issue-delivery`: Issue-Umsetzung und PR-Abschluss.
-- `.agents/skills/eos-quality-triage`: Auswahl angemessener Prüfungen.
-- `.agents/skills/eos-review-triage`: Einordnung von Befunden.
-- `.agents/skills/eos-roadmap-review`: lesende Planungsbewertung.
+- [eos-issue-delivery](.agents/skills/eos-issue-delivery/SKILL.md): Issue-Umsetzung und PR-Abschluss.
+- [eos-quality-triage](.agents/skills/eos-quality-triage/SKILL.md): Auswahl angemessener Prüfungen.
+- [eos-review-triage](.agents/skills/eos-review-triage/SKILL.md): Einordnung von Befunden.
+- [eos-roadmap-review](.agents/skills/eos-roadmap-review/SKILL.md): lesende Planungsbewertung.
 
 Die lokalen Skills werden erst nach bestätigter Bereitstellung gemeinsamer
 Skills in einem gesonderten PR ersetzt.

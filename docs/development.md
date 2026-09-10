@@ -26,6 +26,9 @@ Arbeitsaufträge auch ohne Project-Zugriff verständlich.
 
 Ein Issue beschreibt Nutzerwert oder technisches Ziel, Umfang und Nicht-Ziele,
 prüfbare Akzeptanzkriterien sowie Entscheidungen und Abhängigkeiten.
+Die Vorlagen für [Tasks](../.github/ISSUE_TEMPLATE/task.yml),
+[Stories](../.github/ISSUE_TEMPLATE/story.yml) und
+[Bugs](../.github/ISSUE_TEMPLATE/bug.yml) unterstützen diese Angaben.
 `needs:refinement` und `needs:decision` kennzeichnen fehlende Reife.
 Native Blockerbeziehungen bilden tatsächliche Voraussetzungen ab.
 Stories und größere Zusammenhänge können über Parent-/Sub-Issues verbunden werden.
@@ -94,6 +97,8 @@ mise exec -- lychee --offline --include-fragments README.md AGENTS.md 'docs/**/*
 Die Strukturprüfung erkennt beschädigte YAML-Daten, doppelte Schlüssel,
 unvollständige Skill-Metadaten, unbrauchbare Issue-Formulare und nicht gepinnte
 Action-Verweise.
+Sie prüft außerdem den deaktivierten Ruleset-Vorschlag gegen die tatsächlich
+vorhandenen Checknamen und den vereinbarten Geltungsbereich.
 Lychee prüft nur lokale Ziele und Fragmente; externe URLs werden damit nicht verifiziert.
 Ein dokumentierter Verhaltenstest prüft zusätzlich, ob ein Skill im konkreten
 Auftrag passende Entscheidungen trifft.
@@ -151,6 +156,25 @@ Reständerungen erhalten und mit konkreten Dateinamen zur Entscheidung vorlegen.
 Codex-Aufgaben werden manuell archiviert.
 Merge, Software-Release, Deployment und redaktionelle Veröffentlichung sind
 unterschiedliche Vorgänge.
+
+## Ruleset-Vorschlag
+
+Die [Ruleset-Vorlage](../.github/rulesets/main.json) ist ein deaktivierter,
+separat prüfbarer Vorschlag für `main`.
+Sie verlangt PRs, den erfolgreichen Check `Process checks` von GitHub Actions
+und aufgelöste Review-Threads; Force-Push und Branch-Löschung sind gesperrt.
+Es gibt keine Bypass-Akteure und keine vorgeschriebene native Approve-Anzahl.
+Die menschliche Freigabe nach AGENTS.md bleibt verbindlich.
+
+Die GitHub-Actions-Integration und der Checkname wurden am ersten erfolgreichen
+[PR-Lauf](https://github.com/lxndrp/eos-workbench/actions/runs/34477946173) verifiziert.
+Der Commit dieser Vorlage aktiviert keinen Repositoryschutz.
+Nach einer gesonderten Freigabe werden aktueller Repository-/CI-Stand und
+vorhandene Rulesets erneut gelesen; ausschließlich dieser Vorschlag wird mit
+`enforcement: active` angelegt oder ein eindeutig zugehöriges Ruleset aktualisiert.
+Anschließend müssen aktive Regeln und Geltungsbereich erneut aus GitHub gelesen werden.
+Die Parameter folgen dem
+[GitHub-Ruleset-Vertrag](https://docs.github.com/en/rest/repos/rules#create-a-repository-ruleset).
 
 ## Architekturentscheidungen und spätere Skillübernahme
 
