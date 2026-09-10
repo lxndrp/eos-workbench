@@ -1,0 +1,4 @@
+interface:
+  display_name: "EOS Roadmap Review"
+  short_description: "EOS-Entwicklungsplanung lesend bewerten"
+  default_prompt: "Nutze $eos-roadmap-review für eine lesende Bewertung des nächsten Entwicklungsschritts."

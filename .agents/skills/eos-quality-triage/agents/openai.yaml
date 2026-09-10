@@ -1,0 +1,4 @@
+interface:
+  display_name: "EOS Quality Triage"
+  short_description: "EOS-Prüfungen nach Änderungsrisiko wählen"
+  default_prompt: "Nutze $eos-quality-triage zur Auswahl und Durchführung passender Prüfungen."

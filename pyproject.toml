@@ -1,0 +1,9 @@
+[project]
+name = "eos-process-checks"
+version = "0.0.0"
+description = "Validation tools for the EOS development process, not the application stack"
+requires-python = ">=3.14,<3.15"
+dependencies = ["PyYAML==6.0.3"]
+
+[tool.uv]
+package = false

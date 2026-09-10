@@ -16,3 +16,10 @@ eine automatische Veröffentlichung ist nicht vorgesehen.
 Das Repository beginnt mit der Einrichtung des Entwicklungsprozesses.
 Programmiersprache, Framework, Architektur, Authentifizierung und Deployment
 werden anschließend in eigenen technischen Konzeptionsaufträgen entschieden.
+
+## Entwicklung
+
+- [Entwicklungsleitfaden](docs/development.md): Arbeitsablauf und lokale Prüfungen.
+- [Agentenregeln](AGENTS.md): Auftragsgrenzen, Risiko und Freigaben.
+- [Issues](https://github.com/lxndrp/eos-workbench/issues): dauerhafte Arbeitsaufträge.
+- [Roadmap](https://github.com/users/lxndrp/projects/4): private Entwicklungsplanung.

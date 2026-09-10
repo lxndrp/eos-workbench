@@ -1,0 +1,4 @@
+interface:
+  display_name: "EOS Review Triage"
+  short_description: "EOS-Reviewbefunde belegen und einordnen"
+  default_prompt: "Nutze $eos-review-triage zur Einordnung dieser Reviewbefunde."
