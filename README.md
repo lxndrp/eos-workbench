@@ -19,6 +19,7 @@ werden anschließend in eigenen technischen Konzeptionsaufträgen entschieden.
 
 ## Entwicklung
 
+- [Integrationsanalyse](docs/repository-integration.md): Content-Bestand, Vertragsfragen und nächste Konzeptionsaufträge.
 - [Entwicklungsleitfaden](docs/development.md): Arbeitsablauf und lokale Prüfungen.
 - [Agentenregeln](AGENTS.md): Auftragsgrenzen, Risiko und Freigaben.
 - [Issues](https://github.com/lxndrp/eos-workbench/issues): dauerhafte Arbeitsaufträge.
