@@ -1,0 +1,29 @@
+name: Technischer Auftrag
+description: Einen abgegrenzten Entwicklungsauftrag beschreiben.
+title: "Task: "
+labels: ["type: task"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Ziel
+      description: Welches Ergebnis wird benötigt und warum?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Umfang und Nicht-Ziele
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Akzeptanzkriterien und Prüfung
+    validations:
+      required: true
+  - type: textarea
+    id: decisions
+    attributes:
+      label: Entscheidungen und Abhängigkeiten
+      description: Bestehende Entscheidungen verlinken und tatsächliche Blocker nennen.

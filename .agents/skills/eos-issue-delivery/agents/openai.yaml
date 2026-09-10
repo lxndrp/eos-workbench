@@ -1,0 +1,4 @@
+interface:
+  display_name: "EOS Issue Delivery"
+  short_description: "EOS-Aufträge bis zum geprüften PR liefern"
+  default_prompt: "Nutze $eos-issue-delivery für die Umsetzung dieses EOS-Workbench-Issues."

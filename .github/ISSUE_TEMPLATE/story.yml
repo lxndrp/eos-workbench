@@ -1,0 +1,28 @@
+name: Nutzerfunktion
+description: Nutzerwert und Grenzen einer geplanten Funktion beschreiben.
+title: "Story: "
+labels: ["type: story"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Nutzerwert
+      description: Wer soll was tun können und warum?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Umfang und Nicht-Ziele
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Akzeptanzkriterien
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Entscheidungen und Abhängigkeiten

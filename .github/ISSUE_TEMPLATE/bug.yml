@@ -1,0 +1,31 @@
+name: Fehlerbericht
+description: Einen reproduzierbaren Fehler ohne private Inhalte melden.
+title: "Bug: "
+labels: ["type: bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Bitte ausschließlich synthetische Beispiele verwenden; keine privaten Inhalte, Tokens oder personenbezogenen Daten einfügen.
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduktion
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Erwartetes Verhalten
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Tatsächliches Verhalten
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Umgebung und Nachweise
+      description: Browser, Betriebssystem und Commit nennen; Logs vor dem Teilen bereinigen.
