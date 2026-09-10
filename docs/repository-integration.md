@@ -125,6 +125,9 @@ Eine später korrigierte Content-Datei macht diesen historischen Befund nicht zu
   Diagnose und Lesen bleiben nach Möglichkeit verfügbar.
 - Vor Speichern sind exakter Datei-Diff, Metadatenänderungen, betroffene Beziehungen
   und Konsistenzbefunde gemeinsam prüfbar.
+  Eine ergänzende Inhaltsvorschau zeigt den aktuellen Bearbeitungsstand einschließlich
+  ungespeicherter Änderungen und kennzeichnet nicht unterstützte Darstellungselemente.
+  Sie verspricht keine pixelgenaue Darstellung im späteren Veröffentlichungskanal.
   Neue Objekte erhalten nachvollziehbar vergebene, nicht wiederverwendete Kennungen.
   Eine Beziehungsänderung zeigt alle beabsichtigten Dateianpassungen.
 - Die Vorschau gehört zu einer bestimmten Basisrevision und Änderungsmenge.
@@ -137,6 +140,11 @@ Eine später korrigierte Content-Datei macht diesen historischen Befund nicht zu
   Der gewählte Transport muss die Schreibvorbedingung tatsächlich durchsetzen;
   bloßes Nachlesen unmittelbar vor dem Schreiben verhindert kein Rennen.
 - Mehrdatei-Änderungen müssen als zusammengehöriger Stand prüfbar sein.
+  Die bestehende Synchronisationsregel schließt zunächst automatische bidirektionale
+  Synchronisation aus: Dateibearbeitung löst keine implizite Rücksynchronisation
+  nach Issue oder Project aus.
+  Etwaige zusätzliche Planungsänderungen benötigen einen ausdrücklich gewählten,
+  separat sichtbaren Vorgang und einen zuvor geklärten Quellenvertrag.
   Für Git-Dateien und getrennte Issue-/Project-Schreibvorgänge darf keine
   gemeinsame Atomarität unterstellt werden.
   Teilerfolge, Wiederaufnahme und unklarer Erfolg nach Verbindungsabbruch benötigen ein explizites Konzept.
