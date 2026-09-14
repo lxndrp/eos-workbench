@@ -43,4 +43,4 @@ jobs:
       - name: Run validator regression tests
         run: uv run --locked python -m unittest discover -s tests -v
       - name: Check local documentation links
-        run: lychee --offline --include-fragments README.md AGENTS.md 'docs/**/*.md' '.agents/skills/**/*.md' '.github/*.md'
+        run: lychee --offline --include-fragments README.md AGENTS.md 'docs/**/*.md' '.github/*.md'

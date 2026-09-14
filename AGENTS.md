@@ -87,12 +87,17 @@ Einstufung; diese Tabelle legt die Prüfkonsequenzen fest.
   fehlende Werte bleiben leer und sind kein Abschlussblocker.
   Agentenlaufzeit ist kein vollständiger menschlicher Entwicklungsaufwand.
 
-## Lokale Methoden
+## Gemeinsame Methoden
 
-- [eos-issue-delivery](.agents/skills/eos-issue-delivery/SKILL.md): Issue-Umsetzung und PR-Abschluss.
-- [eos-quality-triage](.agents/skills/eos-quality-triage/SKILL.md): Auswahl angemessener Prüfungen.
-- [eos-review-triage](.agents/skills/eos-review-triage/SKILL.md): Einordnung von Befunden.
-- [eos-roadmap-review](.agents/skills/eos-roadmap-review/SKILL.md): lesende Planungsbewertung.
+Die gemeinsamen Methoden werden außerhalb dieses Repositorys bereitgestellt.
+Sie lesen diese Regeln und den Entwicklungsleitfaden; sie erweitern keine
+Projektbefugnisse.
 
-Die lokalen Skills werden erst nach bestätigter Bereitstellung gemeinsamer
-Skills in einem gesonderten PR ersetzt.
+- `lxndrp-github-issue-delivery`: Issue-Umsetzung und PR-Abschluss.
+- `lxndrp-development-quality-triage`: Auswahl angemessener Prüfungen.
+- `lxndrp-review-triage`: Einordnung von Befunden.
+- `lxndrp-github-roadmap-review`: lesende Planungsbewertung.
+
+Die vier früheren EOS-lokalen Skilldefinitionen wurden nach nachgewiesener
+Bereitstellung durch diese gemeinsamen Methoden ersetzt. Deren versionierte
+Quelle und Verteilung gehören nicht zu diesem Repository.

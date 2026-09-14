@@ -63,31 +63,6 @@ def read_yaml(text):
         raise ValidationError(f"invalid YAML: {error}") from error
 
 
-def validate_skill(path):
-    text = path.read_text(encoding="utf-8")
-    match = re.match(r"\A---\r?\n(.*?)\r?\n---(?:\r?\n|\Z)", text, re.S)
-    require(match is not None, "SKILL.md needs YAML frontmatter")
-    data = mapping(read_yaml(match.group(1)), "skill frontmatter")
-    name = data.get("name")
-    require(nonempty(name) and re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", name), "invalid skill name")
-    require(len(name) <= 64 and name == path.parent.name, "skill name must match its folder (max 64 chars)")
-    require(nonempty(data.get("description")), "skill description is required")
-    require(bool(text[match.end():].strip()), "skill instructions are empty")
-    ui_path = path.parent / "agents" / "openai.yaml"
-    ui = mapping(read_yaml(ui_path.read_text(encoding="utf-8")), "skill UI metadata")
-    interface = mapping(ui.get("interface"), "interface")
-    require(nonempty(interface.get("display_name")), "display_name is required")
-    short = interface.get("short_description")
-    require(nonempty(short) and 25 <= len(short) <= 64, "short_description must have 25–64 characters")
-    prompt = interface.get("default_prompt")
-    require(nonempty(prompt) and re.search(r"\$" + re.escape(name) + r"(?![a-z0-9-])", prompt),
-            "default_prompt must invoke this skill")
-    if "policy" in ui:
-        policy = mapping(ui["policy"], "policy")
-        if "allow_implicit_invocation" in policy:
-            require(isinstance(policy["allow_implicit_invocation"], bool), "invocation policy must be boolean")
-
-
 def validate_issue_form(data):
     data = mapping(data, "issue form")
     require(nonempty(data.get("name")) and nonempty(data.get("description")), "form name and description are required")
@@ -180,8 +155,7 @@ def validate_ruleset(data, workflow):
 
 def check_repository(root):
     errors = []
-    checks = [(folder / "SKILL.md", validate_skill)
-              for folder in sorted((root / ".agents/skills").glob("*")) if folder.is_dir()]
+    checks = []
     templates = root / ".github/ISSUE_TEMPLATE"
     for path in sorted([*templates.glob("*.yml"), *templates.glob("*.yaml")]):
         checks.append((path, lambda p: validate_issue_form(read_yaml(p.read_text(encoding="utf-8")))))

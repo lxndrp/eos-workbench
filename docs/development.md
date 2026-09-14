@@ -79,7 +79,7 @@ mise exec -- uv sync --locked
 | Änderung | Prüfung |
 | --- | --- |
 | Eigene Dokumentation | Whitespace und lokale Links |
-| Skill oder GitHub-Vorlage | Zusätzlich Strukturprüfung und betroffene Tests |
+| GitHub-Vorlage | Zusätzlich Strukturprüfung und betroffene Tests |
 | Validator, Workflow oder Prozesswerkzeuge | Alle folgenden Prozessprüfungen |
 | Spätere Anwendungsänderung | Im Architektur-/Implementierungsauftrag passende Fachtests ergänzen |
 
@@ -91,7 +91,7 @@ git diff --cached --check
 git diff --check origin/main...HEAD
 mise exec -- uv run --locked python scripts/check_process.py
 mise exec -- uv run --locked python -m unittest discover -s tests -v
-mise exec -- lychee --offline --include-fragments README.md AGENTS.md 'docs/**/*.md' '.agents/skills/**/*.md' '.github/*.md'
+mise exec -- lychee --offline --include-fragments README.md AGENTS.md 'docs/**/*.md' '.github/*.md'
 ```
 
 Die Strukturprüfung erkennt beschädigte YAML-Daten, doppelte Schlüssel,
@@ -184,9 +184,9 @@ Programmiersprache, kein Framework und keinen Deploymentanbieter.
 Der Konzeptions-Pilot erhebt Anforderungen am aktuellen Content-Stand und
 liefert technische Entscheidungsaufträge, ohne das Fachmodell zu duplizieren.
 
-Gemeinsame Methoden sollen später als versionierte Skillquellen gepflegt werden.
-Die vier lokalen EOS-Skills bleiben bis zum bestätigten Bereitstellungsnachweis aktiv.
-Die Umstellung erfolgt in einem eigenen PR und wird in einem frischen
-Codex-Kontext geprüft.
-Installation, automatische Verteilung und chezmoi-Bootstrap sind kein Teil
-dieser Prozessgrundlage.
+Die gemeinsamen Methoden werden als versionierte Skillquellen außerhalb dieses
+Repositorys gepflegt. Ihre Bereitstellung und Erkennung wurden vor der
+Umstellung in einem frischen Codex-Kontext geprüft. Die Workbench referenziert
+die gemeinsamen `lxndrp-*`-Namen; lokale EOS-Doppeldefinitionen bestehen nicht
+mehr. Installation, automatische Verteilung und chezmoi-Bootstrap sind kein
+Teil dieser Prozessgrundlage.

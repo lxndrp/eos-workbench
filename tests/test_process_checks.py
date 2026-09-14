@@ -8,7 +8,7 @@ import unittest
 
 from scripts.check_process import (
     ValidationError, check_repository, read_yaml, validate_issue_form,
-    validate_ruleset, validate_skill, validate_workflow,
+    validate_ruleset, validate_workflow,
 )
 
 
@@ -112,48 +112,6 @@ class WorkflowTests(unittest.TestCase):
             validate_workflow(workflow)
 
 
-class SkillTests(unittest.TestCase):
-    def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
-        self.addCleanup(self.temp.cleanup)
-        self.folder = Path(self.temp.name) / "synthetic-skill"
-        (self.folder / "agents").mkdir(parents=True)
-        self.path = self.folder / "SKILL.md"
-        self.path.write_text("---\nname: synthetic-skill\ndescription: A synthetic workflow\n---\nRead the task.\n")
-        self.ui = self.folder / "agents/openai.yaml"
-        self.ui.write_text('interface:\n  display_name: "Synthetic Skill"\n'
-                           '  short_description: "Validate a synthetic workflow"\n'
-                           '  default_prompt: "Use $synthetic-skill for this task."\n')
-
-    def test_valid_skill(self):
-        validate_skill(self.path)
-
-    def test_missing_frontmatter(self):
-        self.path.write_text("Instructions without metadata")
-        with self.assertRaises(ValidationError):
-            validate_skill(self.path)
-
-    def test_mismatched_identity(self):
-        self.path.write_text(self.path.read_text().replace("synthetic-skill", "different-skill"))
-        with self.assertRaisesRegex(ValidationError, "folder"):
-            validate_skill(self.path)
-
-    def test_missing_instructions(self):
-        self.path.write_text(self.path.read_text().replace("Read the task.\n", ""))
-        with self.assertRaisesRegex(ValidationError, "empty"):
-            validate_skill(self.path)
-
-    def test_prompt_invokes_wrong_skill(self):
-        self.ui.write_text(self.ui.read_text().replace("$synthetic-skill", "$synthetic-skill-other"))
-        with self.assertRaisesRegex(ValidationError, "invoke"):
-            validate_skill(self.path)
-
-    def test_missing_ui_file(self):
-        self.ui.unlink()
-        with self.assertRaises(OSError):
-            validate_skill(self.path)
-
-
 class RepositoryTests(unittest.TestCase):
     def test_missing_workflow_is_reported(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -161,14 +119,6 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual(count, 1)
         self.assertEqual(len(errors), 1)
         self.assertIn("process-checks.yml", errors[0])
-
-    def test_skill_directory_without_entrypoint_is_reported(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / ".agents/skills/incomplete-skill/agents").mkdir(parents=True)
-            errors, count = check_repository(root)
-        self.assertEqual(count, 2)
-        self.assertTrue(any("incomplete-skill/SKILL.md" in error for error in errors))
 
     def test_yaml_extension_form_is_not_silently_skipped(self):
         with tempfile.TemporaryDirectory() as directory:
