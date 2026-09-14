@@ -154,6 +154,34 @@ Frontend-Kandidaten offen:
 | React mit TypeScript | Browsernahe HTML-, Formular- und Markdown-Integration; gemeinsamer Typraum mit einem TypeScript-BFF | Kein direkter Weg zu einer lokalen Desktop-Anwendung; Abhängigkeiten und clientseitige Renderinggrenzen gezielt klein halten |
 | Flutter Web mit Dart | Einheitliche UI-Basis für Web und eine spätere macOS-Anwendung; Flutter unterstützt beide Zielplattformen | Flutter Web benötigt bewusste Semantik-Aktivierung und -Tests für Screenreader; Markdown-/HTML-Einbettungen, Startgröße und Web-Interoperabilität müssen am echten vertikalen Schnitt geprüft werden |
 
+### Gegenüberstellung
+
+Die folgende Bewertung trennt belastbare Eigenschaften von noch zu messenden
+Punkten.
+Sie ist kein gewichteter Endentscheid: Der relative Wert einer späteren
+lokalen macOS-Anwendung gegenüber einer möglichst browsernahen ersten
+Workbench muss vor der Frameworkwahl bewusst gewichtet werden.
+
+| Kriterium | React mit TypeScript | Flutter Web mit Dart | Bedeutung für EOS |
+| --- | --- | --- | --- |
+| GitHub-Token und private Repository-Inhalte | Gleich: Bei ausschließlichem BFF-Zugriff erreichen weder Token noch GitHub-Client den Browser. | Gleich: Flutter Web benötigt dieselbe BFF-Grenze. | Kein Auswahlkriterium; browserdirekte Varianten bleiben für beide ausgeschlossen. |
+| GitHub-API, Project- und Konfliktvertrag | Direkte TypeScript-Modelle können mit dem TypeScript-BFF geteilt werden. | Der Vertrag wird über JSON-Schema oder generierten Dart-Code separat abgebildet. | React reduziert im BFF-Vorschlag die Gefahr auseinanderlaufender technischer Typen; die fachliche Quelle bleibt in beiden Fällen `eos-content`. |
+| Verlustfreie Datei- und Diff-Ansicht | Browser- und DOM-nahe Komponenten eignen sich für Textdiff, Rohansicht und große Markdown-Dokumente. | Möglich, aber für Texteditor-, Diff- und Web-Interoperabilität sind gezielte Komponenten- und Performanceprüfungen nötig. | Der Adapter bleibt server- und frameworkunabhängig; die UI darf keine ganze Datei neu generieren. |
+| Sichere Markdown-Vorschau | React kann browsernative HTML-Elemente direkt verwenden; eine Sanitizer-/AST-Pipeline bleibt zwingend, insbesondere ohne unsicheres Roh-HTML-Rendering. | Flutter kann Markdown als Widgetbaum darstellen; HTML- oder Webview-Einbettungen erhöhen den Prüfbedarf und dürfen die Sperren für aktive Inhalte nicht umgehen. | React hat hier weniger Integrationsrisiko, nicht weniger Sicherheitsverantwortung. |
+| Barrierefreiheit im Web | Browsernative Elemente bieten unmittelbar die übliche DOM- und ARIA-Grundlage; Komponenten und Fokusführung müssen dennoch getestet werden. | Flutter bildet Semantik in ein zugängliches DOM ab, muss sie für Web aber bewusst aktivieren und mit Screenreadern prüfen. | React hat einen pragmatischen Vorteil für den webbasierten Erstbetrieb; Flutter ist bei nachgewiesener Semantik nicht ausgeschlossen. |
+| Bedienung als anspruchsvolle Arbeitsoberfläche | Starke Browser- und Formularintegration; Komponentenauswahl und State-Management müssen schlank bleiben. | Einheitliches Widget- und Zustandsmodell für komplexe, interaktive Oberflächen. | Beide sind geeignet; der synthetische Schnitt muss Tastatur, Fokus, Fehlermeldungen und Mehrspaltenansichten zeigen. |
+| Spätere lokale macOS-Anwendung | Erfordert eine zusätzliche Plattformstrategie und wahrscheinlich einen getrennten Client. | Kann UI und Teile der Anwendungslogik für macOS wiederverwenden. | Flutter hat einen klaren strategischen Vorteil, falls lokales Arbeiten mit Content-Checkout und OS-Credential-Speicher ein bestätigtes Ziel wird. |
+| Web-Build und Betrieb | Klassische statische Webartefakte neben dem BFF; konkrete Bundlegröße und Abhängigkeiten messen. | `flutter build web` erzeugt Webartefakte; Quellkarten dürfen nicht öffentlich ausgeliefert werden und Startverhalten muss gemessen werden. | Kein pauschaler Performance-Sieger; reale Release-Builds mit derselben Aufgabe vergleichen. |
+| Teamwissen und Wartung | Abhängig von vorhandenem TypeScript-/React-Wissen. | Abhängig von vorhandenem Dart-/Flutter-Wissen und der Bereitschaft, Web-Spezifika bewusst zu testen. | Noch unbekannt; vor der Auswahl ausdrücklich erheben, nicht vermuten. |
+
+**Zwischenfazit:** Für eine rein webbasierte erste Workbench bietet React
+geringere Risiken bei browsernativer Semantik, Markdown- und Diff-Integration
+sowie einem TypeScript-BFF-Vertrag.
+Flutter ist die gleichwertige strategische Alternative, wenn eine spätere
+lokale macOS-Anwendung einen hohen Stellenwert besitzt und der zusätzliche
+Nachweis für Web-Semantik, Vorschau und Release-Verhalten erbracht wird.
+Keine dieser Aussagen ersetzt den synthetischen Vergleichsspike.
+
 Flutter Web ersetzt das BFF nicht: Eine browserdirekt laufende Flutter-App
 hätte dieselben Token-, Vorschau- und externen Ressourcenrisiken wie jede
 andere browserdirekte Lösung.
