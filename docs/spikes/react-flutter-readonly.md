@@ -65,14 +65,14 @@ keine Prognose für eine produktive Workbench.
 | Produktionsartefakt | 204 KiB gesamt; JavaScript: 198.060 Byte (62,02 kB gzip) | 40.684 KiB gesamt einschließlich CanvasKit-/Wasm-Laufzeit |
 | Verhaltenstest | 1 Test bestanden | 2 Tests bestanden |
 | Produktionsbuild | `npm run build` bestanden | `flutter build web --release --no-source-maps` bestanden |
-| Sichtprüfung semantischer Kernzustände | lokale Chrome-Headless-Sichtprüfung: sichtbar | Widgettest: Sperrhinweise, Semantiklabels und fehlendes `Image` nachgewiesen |
+| Sichtprüfung semantischer Kernzustände | lokale Chrome-Headless-Sichtprüfung: sichtbar | lokale Chrome-Headless-Sichtprüfung: sichtbar; Widgettest prüft zusätzlich Sperrhinweise, Semantiklabels und fehlendes `Image` |
 
-Die React-Sichtprüfung zeigt die Quellmarkierung, den synthetischen
-Integrationsfehler, die Metadaten, den Beziehungsbefund sowie beide
-Sperrhinweise. Ein lokaler Chrome-Headless-Versuch konnte den Flutter-
-Canvas-/Wasm-Renderer auf diesem Host wegen CoreDisplay-/WebGL-Fehlern nicht
-sichtbar abbilden. Das ist ein Umgebungsbefund; der Flutter-Web-Build und die
-Widgettests waren erfolgreich. Eine spätere produktnahe UI-Prüfung muss mit
+Die lokale React- und Flutter-Sichtprüfung zeigt jeweils Quellmarkierung,
+synthetischen Integrationsfehler, Metadaten, Beziehungsbefund und beide
+Sperrhinweise. Die Flutter-Ansicht benötigt wegen des asynchronen
+Fixture-Ladens eine ausreichende Wartezeit. Die lokalen Serverprotokolle
+enthielten nur eigene Build-Artefakte und die Fixture, keinen Abruf der
+externen Medien-URL. Eine spätere produktnahe UI-Prüfung muss dennoch mit
 einem regulären Browser- und Screenreader-Setup erfolgen.
 
 ## Grenzen und nächste Einordnung
