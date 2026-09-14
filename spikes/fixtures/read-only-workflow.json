@@ -1,0 +1,76 @@
+{
+  "repository": {
+    "name": "eos-content (synthetic)",
+    "revision": "4f7a9c2",
+    "path": "topics/synthetic-workflow.md",
+    "source": "Read-only fixture; no repository connection"
+  },
+  "document": {
+    "kind": "Topic",
+    "title": "Synthetic workflow observation",
+    "status": "review",
+    "knownMetadata": [
+      {
+        "label": "Editorial status",
+        "value": "review",
+        "source": "front matter"
+      },
+      {
+        "label": "Series",
+        "value": "Synthetic examples",
+        "source": "front matter"
+      }
+    ],
+    "unknownMetadata": {
+      "key": "x-editorial-note",
+      "value": "Retained without interpretation",
+      "source": "unknown front-matter field"
+    },
+    "relations": [
+      {
+        "kind": "Observation",
+        "title": "Synthetic source signal",
+        "state": "linked"
+      },
+      {
+        "kind": "Publication",
+        "title": "Synthetic publication draft",
+        "state": "one-sided"
+      }
+    ],
+    "findings": [
+      {
+        "severity": "warning",
+        "message": "The Publication references this Topic, but the reverse relation is absent."
+      }
+    ],
+    "rawMarkdown": "# Synthetic workflow observation\n\nA **synthetic** read-only document.\n\n<script>window.syntheticProbe = true</script>\n\n![External probe](https://media.invalid/synthetic.png)\n",
+    "preview": {
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "Synthetic workflow observation"
+        },
+        {
+          "type": "paragraph",
+          "text": "A synthetic read-only document."
+        },
+        {
+          "type": "html",
+          "source": "<script>window.syntheticProbe = true</script>",
+          "blocked": "Raw HTML is shown only in the source view and is not rendered."
+        },
+        {
+          "type": "image",
+          "source": "https://media.invalid/synthetic.png",
+          "blocked": "External media is not requested in the preview."
+        }
+      ]
+    },
+    "integration": {
+      "state": "error",
+      "message": "Synthetic permission failure: the configured repository context is unavailable.",
+      "detail": "This fixture has no token, network client, or retry action."
+    }
+  }
+}
