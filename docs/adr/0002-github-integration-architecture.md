@@ -1,8 +1,8 @@
-# ADR 0002: Servergestützte GitHub-Integration für die EOS Workbench
+# ADR 0002: Architekturvorschlag für die GitHub-Integration der EOS Workbench
 
-- Status: Vorgeschlagen – menschliches C4-Review erforderlich
+- Status: Diskussionsvorlage – noch kein Architekturentscheid
 - Datum: 2026-09-14
-- Entscheidet: Anwendungsarchitektur, GitHub-Authentifizierung und
+- Bewertet: Anwendungsarchitektur, GitHub-Authentifizierung, UI-Optionen und
   Sicherheitsgrenzen der ersten EOS-Workbench
 - Geltungsbereich: Eine kleine Webanwendung für ein ausdrücklich konfiguriertes
   privates `eos-content`-Repository desselben GitHub-Accounts
@@ -32,28 +32,34 @@ Die aktuelle Machbarkeit wurde anhand der folgenden offiziellen Quellen geprüft
 - [GraphQL-Authentifizierung](https://docs.github.com/en/graphql/guides/forming-calls-with-graphql)
 - [OWASP: XSS-Prävention](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
   und [Content Security Policy](https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html)
+- [Flutter für mehrere Plattformen](https://docs.flutter.dev/platform-integration),
+  [Flutter Web](https://docs.flutter.dev/deployment/web) und
+  [Flutter Web Accessibility](https://docs.flutter.dev/ui/accessibility/web-accessibility)
 
 GitHubs REST-API erlaubt GitHub-App-User-Tokens für das Schreiben von
 Repository-Inhalten, verlangt dafür aber mindestens `Contents: write`.
 Project-V2-Zugriffe sind grundsätzlich über GraphQL möglich; die für die
 konkreten Abfragen notwendige GitHub-App-Berechtigung muss laut GitHub gegen
 den tatsächlichen Zugriff geprüft werden.
-Diese Entscheidung verspricht daher keine ungeprüfte Project-Automation.
+Diese Diskussionsvorlage verspricht daher keine ungeprüfte Project-Automation.
 
-## Entscheidungsvorschlag
+## Architekturvorschlag
 
-Die erste Workbench wird als same-origin Webanwendung mit einem
-serverseitigen Backend-for-Frontend (BFF) umgesetzt.
+Als zentrale Architekturgrenze wird eine same-origin Webanwendung mit einem
+serverseitigen Backend-for-Frontend (BFF) vorgeschlagen.
 
-Der vorgeschlagene Stack ist TypeScript in beiden Teilen, ein React-Frontend
-und ein schlankes Node.js-BFF mit Fastify.
-Das BFF und die statischen Frontend-Artefakte werden später gemeinsam hinter
+Für das BFF steht ein schlanker Node.js-Dienst mit TypeScript und Fastify als
+Ausgangskandidat zur Auswahl.
+Für das Frontend wird **noch kein Framework entschieden**:
+React mit TypeScript und Flutter Web mit Dart bilden die enge Auswahl.
+Beide Varianten verwenden dieselbe BFF-Grenze und dieselben GitHub-Rechte.
+Das BFF und die jeweiligen Frontend-Artefakte werden später gemeinsam hinter
 einem TLS-Terminierungspunkt betrieben.
 Eine Datenbank, ein Suchindex mit eigener Wahrheit, Hintergrundsynchronisation
 und Telemetrie mit Inhaltsdaten gehören nicht zum Ansatz.
 
 ```text
-Browser
+Browser: React oder Flutter Web
   |  HTTPS, gleiche Origin, HttpOnly-Sitzung
   v
 EOS-BFF
@@ -64,6 +70,14 @@ GitHub REST und GraphQL
   v
 eos-content und Editorial System
 ```
+
+Flutter bleibt zusätzlich als mögliche spätere lokale macOS-Anwendung in der
+Betrachtung.
+Das ist kein Auftrag für eine Desktop-Anwendung, erweitert aber die spätere
+Option, private Inhalte und Credentials auf dem Nutzergerät zu halten.
+Flutter unterstützt Web und macOS aus einer Codebasis; dieser Vorteil muss
+gegen Web-Barrierefreiheit, Markdown-Integration und Bundle-Verhalten geprüft
+werden.
 
 Das BFF ist ein technischer Vermittler.
 Es hält keine redaktionellen Objekte, Beziehungen, Status oder Inhalte als
@@ -128,13 +142,44 @@ Veröffentlichungs- oder Freigabebehauptung.
 Die serverseitige Antwort enthält eine Basisrevision, damit spätere
 Änderungs- und Konfliktprüfungen darauf aufbauen können.
 
+## Enge Auswahl für das Frontend
+
+Die BFF-Grenze löst die Token- und Repository-Frage unabhängig vom
+UI-Framework.
+Für den ersten vertikalen Schnitt bleiben daher zwei gleichberechtigte
+Frontend-Kandidaten offen:
+
+| Kandidat | Stärken für die Workbench | Zu prüfende Risiken |
+| --- | --- | --- |
+| React mit TypeScript | Browsernahe HTML-, Formular- und Markdown-Integration; gemeinsamer Typraum mit einem TypeScript-BFF | Kein direkter Weg zu einer lokalen Desktop-Anwendung; Abhängigkeiten und clientseitige Renderinggrenzen gezielt klein halten |
+| Flutter Web mit Dart | Einheitliche UI-Basis für Web und eine spätere macOS-Anwendung; Flutter unterstützt beide Zielplattformen | Flutter Web benötigt bewusste Semantik-Aktivierung und -Tests für Screenreader; Markdown-/HTML-Einbettungen, Startgröße und Web-Interoperabilität müssen am echten vertikalen Schnitt geprüft werden |
+
+Flutter Web ersetzt das BFF nicht: Eine browserdirekt laufende Flutter-App
+hätte dieselben Token-, Vorschau- und externen Ressourcenrisiken wie jede
+andere browserdirekte Lösung.
+Für beide Kandidaten sind deshalb dieselben Akzeptanztests verbindlich:
+
+1. Tastaturbedienung, sichtbarer Fokus, Screenreader-Semantik und Zoom auf
+   der Repositoryübersicht, einer Metadatenansicht und der Vorschau.
+2. Keine Token oder privaten Inhalte im Browser-Speicher, Bundle, Netzwerklog
+   oder Fehlerbericht.
+3. Roh-HTML, aktive Inhalte und externe Medien bleiben in der Vorschau
+   blockiert; nicht unterstützte Elemente sind erkennbar.
+4. Ein Release-Build und dessen Quellkarten werden nicht öffentlich mit
+   privaten Pfaden oder Diagnoseinformationen ausgeliefert.
+
+Flutter dokumentiert für Web eine in das DOM übersetzte Semantikschicht, die
+aus Performancegründen explizit aktiviert werden muss.
+Das ist kein Ausschlusskriterium, sondern ein verpflichtender Nachweis im
+Flutter-Spike.
+
 ## Vergleich der Alternativen
 
-| Ansatz | Vorteile | Risiken und Aufwand | Entscheidung |
+| Ansatz | Vorteile | Risiken und Aufwand | Bewertung |
 | --- | --- | --- | --- |
-| Lokale Verarbeitung mit lokalem Checkout oder nativer Begleitkomponente | Private Inhalte und Tokens verlassen das Nutzergerät nicht; Git-Operationen können lokal erfolgen | Installation, OS-Credential-Integration und plattformabhängige Brücke; keine einfache browserbasierte Nutzung oder zentrale Sicherheitsgrenze | Als späterer Offline-/Power-User-Modus offen, nicht erster Webansatz |
-| Browser-direkte GitHub-Integration | Kein eigener Server und schneller Prototyp | User-Tokens und private Inhalte liegen im Browser-Kontext; XSS, Browser-Erweiterungen und CORS-/API-Beschränkungen werden Teil der Sicherheitsgrenze; GitHub-App-Private-Key darf nicht an Clients | Für schreibende Workbench verworfen; höchstens isolierter read-only Prototyp |
-| Servergestütztes BFF mit GitHub-App-User-Token | Token bleibt serverseitig, Rechte sind durch App und Nutzer begrenzt, same-origin Grenze für Vorschau und Logging | Betrieb eines kleinen Servers, Secret Store, Login-Callback und Sicherheitsupdates nötig | Empfohlen |
+| Lokale Verarbeitung mit lokalem Checkout oder nativer Begleitkomponente, etwa Flutter für macOS | Private Inhalte und Tokens verlassen das Nutzergerät nicht; Git-Operationen können lokal erfolgen | Installation, OS-Credential-Integration und plattformabhängige Brücke; keine einfache browserbasierte Nutzung oder zentrale Sicherheitsgrenze | Als späterer Offline-/Power-User-Modus offen, nicht erster Webansatz |
+| Browser-direkte GitHub-Integration, unabhängig von React oder Flutter Web | Kein eigener Server und schneller Prototyp | User-Tokens und private Inhalte liegen im Browser-Kontext; XSS, Browser-Erweiterungen und CORS-/API-Beschränkungen werden Teil der Sicherheitsgrenze; GitHub-App-Private-Key darf nicht an Clients | Für schreibende Workbench verworfen; höchstens isolierter read-only Prototyp |
+| Servergestütztes BFF mit GitHub-App-User-Token | Token bleibt serverseitig, Rechte sind durch App und Nutzer begrenzt, same-origin Grenze für Vorschau und Logging | Betrieb eines kleinen Servers, Secret Store, Login-Callback und Sicherheitsupdates nötig | Architekturvorschlag; Frontend bleibt zwischen React und Flutter Web offen |
 
 Ein reiner OAuth-App-Ansatz wird nicht empfohlen.
 Er benötigt für private Repositories breite `repo`-Scopes, während die
@@ -155,6 +200,9 @@ gesamten Redaktionsprozess:
 5. Die Markdown-Vorschau ohne Roh-HTML und ohne externe Inhaltsabrufe zeigen.
 6. Project- und Issue-Kontext nur lesen; ein fehlender Zugriff erscheint als
    nachvollziehbarer Berechtigungs- oder Integrationsbefund.
+7. React und Flutter Web mit derselben synthetischen Aufgabe anhand der
+   Kriterien aus „Enge Auswahl für das Frontend“ bewerten; erst dann das
+   Frontend auswählen.
 
 Alle Tests, Demos und Logs verwenden synthetische Inhalte.
 Der Schnitt erzeugt keine Commits, Pull Requests, Project-Änderungen oder
@@ -182,6 +230,9 @@ erforderlich:
    in der Vorschau blockiert.
 4. Den vollständigen Berechtigungs- und Secret-Lebenszyklus vor der ersten
    produktiven App-Registrierung als Betriebsanleitung reviewen.
+5. Für Flutter Web die aktivierte Semantik, Tastaturbedienung, Screenreader-
+   Verhalten und den Verzicht auf unsichere HTML-/Webview-Einbettungen gegen
+   die synthetische Vorschau prüfen.
 
 Ein fehlgeschlagener Spike ist ein Architektur- oder Berechtigungsbefund.
 Er darf nicht durch eine breitere Token-Berechtigung oder Browser-Speicherung
@@ -189,9 +240,10 @@ umgangen werden.
 
 ## Konsequenzen und Folgearbeit
 
-Die Entscheidung erlaubt die Vorbereitung eines kleinen TypeScript-Webprojekts
-mit React-Frontend und Fastify-BFF, aber noch keine App-Registrierung,
-Secret-Anlage, Cloud-Aktivierung oder produktive Bereitstellung.
+Diese Diskussionsvorlage erlaubt die Vorbereitung eines kleinen Webprojekts
+mit einem BFF-Kandidaten und der engen Frontend-Auswahl React oder Flutter
+Web, aber noch keine App-Registrierung, Secret-Anlage, Cloud-Aktivierung oder
+produktive Bereitstellung.
 
 - Issue #8 konkretisiert den verlustfreien Adapter, Bearbeiten und Vorschau
   innerhalb der hier beschlossenen read-only Sicherheitsgrenze.
@@ -200,7 +252,9 @@ Secret-Anlage, Cloud-Aktivierung oder produktive Bereitstellung.
 - Die im ersten vertikalen Schnitt genannten Spikes sind Eintrittskriterien
   für die Implementierung, keine stillschweigende Abkürzung dieser ADR.
 
-Menschliches C4-Review entscheidet insbesondere über den Betrieb eines BFF,
-die GitHub-App-Registrierung, die gewählte Secret-Verwaltung und eine spätere
-Erhöhung von `Contents: read` auf `Contents: write`.
-Bis dahin bleibt diese ADR vorgeschlagen.
+Menschliches C4-Review entscheidet, ob die BFF-Grenze, die GitHub-App-
+Registrierung, die gewählte Secret-Verwaltung und die spätere Erhöhung von
+`Contents: read` auf `Contents: write` verfolgt werden.
+Die Auswahl zwischen React und Flutter Web erfolgt erst nach den beschriebenen
+Spikes und einem nachvollziehbaren Vergleich.
+Bis dahin bleibt dieses Dokument eine Diskussionsvorlage.
