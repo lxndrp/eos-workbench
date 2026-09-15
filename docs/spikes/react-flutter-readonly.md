@@ -78,6 +78,6 @@ einem regulären Browser- und Screenreader-Setup erfolgen.
 ## Grenzen und nächste Einordnung
 
 Es gibt keine Schreibfunktion, Persistenz, Authentifizierung, GitHub-API,
-Token, echte Inhalte oder Veröffentlichung. Die Ergebnisse werden erst nach
-dem Merge der getrennten Architektur-Diskussionsvorlage in deren ADR ergänzt.
-Damit entsteht keine konkurrierende Änderung an einem noch offenen PR.
+Token, echte Inhalte oder Veröffentlichung. Die gemessenen Befunde sind in
+[ADR 0002](../adr/0002-github-integration-architecture.md) als Evidenz für
+die weiterhin offene Frameworkbewertung übernommen.
