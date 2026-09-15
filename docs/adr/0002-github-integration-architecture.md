@@ -266,6 +266,38 @@ Ein fehlgeschlagener Spike ist ein Architektur- oder Berechtigungsbefund.
 Er darf nicht durch eine breitere Token-Berechtigung oder Browser-Speicherung
 umgangen werden.
 
+### Ergebnis des React-/Flutter-Read-only-Spikes
+
+Issue #15 hat den UI-Teil des synthetischen Vergleichs durchgeführt.
+Der vollständige, ausschließlich synthetische Vertrag und die lokalen
+Ausführungsanweisungen stehen in
+[der Spike-Dokumentation](../spikes/react-flutter-readonly.md).
+Beide Prototypen verwenden dieselbe Fixture mit Quellmarkierung,
+bekannten und unbekannten Metadaten, einem Beziehungsbefund, Roh-Markdown,
+einer gesperrten Vorschau und einem synthetischen Berechtigungsfehler.
+
+| Nachweis | React Web | Flutter Web |
+| --- | ---: | ---: |
+| Produktionsartefakt | 204 KiB gesamt; JavaScript: 198.060 Byte (62,02 kB gzip) | 40.684 KiB gesamt einschließlich CanvasKit-/Wasm-Laufzeit |
+| Verhaltenstest | 1 Test bestanden | 2 Tests bestanden |
+| Produktionsbuild | bestanden | bestanden, ohne Source Maps |
+| Sichtprüfung | lokale Chrome-Headless-Sichtprüfung sichtbar | lokale Chrome-Headless-Sichtprüfung sichtbar; Widgettest zusätzlich für Sperrhinweise, Semantiklabels und fehlendes `Image` |
+
+In beiden Varianten blieben Roh-HTML und externe Medien sichtbar als blockiert.
+Die lokale Sichtprüfung rief nur eigene Build-Artefakte und die Fixture ab,
+nicht die in der Rohansicht enthaltene externe Medien-URL.
+Flutter aktiviert die Web-Semantik programmgesteuert über
+`SemanticsBinding.instance.ensureSemantics()`; die Widgettests belegen die
+vereinbarten Sperr- und Semantikzustände.
+
+Der Spike belegt damit die Umsetzbarkeit des gemeinsamen read-only
+Arbeitsablaufs und der vorgesehenen Sicherheitsgrenzen in beiden Kandidaten.
+Er misst weder eine produktive Anwendung noch die Qualität eines allgemeinen
+Markdown-Parsers und trifft keine Frameworkentscheidung. Die deutlich
+unterschiedlichen Artefaktgrößen sind ein zu gewichtender Betriebsbefund,
+kein alleiniger Auswahlgrund. Die finale Auswahl bleibt dem menschlichen
+C4-Review vorbehalten.
+
 ## Konsequenzen und Folgearbeit
 
 Diese Diskussionsvorlage erlaubt die Vorbereitung eines kleinen Webprojekts
